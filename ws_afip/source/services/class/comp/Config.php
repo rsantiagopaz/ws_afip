@@ -3,7 +3,7 @@
 require_once("Conexion.php");
 
 
-$modo = "homologacion";			// homologacion, produccion
+$ws_afip_modo = "homologacion";			// homologacion, produccion
 $CUIT = 20267565393;			// CUIT del emisor de las facturas. Solo numeros sin comillas.
 
 
@@ -20,10 +20,21 @@ $produccion_passphrase = "";
 
 
 
-$path = "ws_afip/" . $modo . "/";
 
 
-if ($modo == "produccion") {
+
+
+
+
+//--------------------------------------------------------------------------------------------------
+
+
+
+
+$path = "ws_afip/" . $ws_afip_modo . "/";
+
+
+if ($ws_afip_modo == "produccion") {
 	$wsaa_url = "";
 	$wsfev1_url = "";
 	
