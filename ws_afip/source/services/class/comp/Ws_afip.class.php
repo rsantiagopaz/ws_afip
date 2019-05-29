@@ -35,9 +35,9 @@ class Ws_afip
 		$this->config = new stdClass;
 		
 		if (isset($modo)) {
-			if ($modo == "H") $this->config->modo = "homologacion"; else if ($modo == "P") $this->config->modo = "produccion";
+			$this->config->modo = $modo;
 		} else {
-			if ($this->rowEmisor->modo == "H") $this->config->modo = "homologacion"; else if ($this->rowEmisor->modo == "P") $this->config->modo = "produccion";
+			$this->config->modo = $this->rowEmisor->modo;
 		}
 		
 		
@@ -52,8 +52,8 @@ class Ws_afip
 			$this->config->passphrase = $this->rowEmisor->homologacion_passphrase;
 			
 		} else if ($this->config->modo == "produccion") {
-			$this->config->wsaa_url = "";
-			$this->config->wsfev1_url = "";
+			$this->config->wsaa_url = "https://wsaa.afip.gov.ar/ws/services/LoginCms";
+			$this->config->wsfev1_url = "https://servicios1.afip.gov.ar/wsfev1/service.asmx";
 			
 			$this->config->crt = $this->rowEmisor->produccion_crt;
 			$this->config->key = $this->rowEmisor->produccion_key;
@@ -159,6 +159,23 @@ class Ws_afip
 			);
 			
 			return $this->Wsfev1->FECompUltimoAutorizado($p);
+		}
+	}
+	
+	
+	
+	public function FECompConsultar($p) {
+		
+		$GetTA = $this->Wsaa->GetTA("wsfe");
+		
+		if ($GetTA->TA) {
+			$p["Auth"] = array(
+				"Token"	=> $GetTA->TA->credentials->token,
+				"Sign"	=> $GetTA->TA->credentials->sign,
+				"Cuit"	=> $this->rowEmisor->cuit
+			);
+			
+			return $this->Wsfev1->FECompConsultar($p);
 		}
 	}
 	

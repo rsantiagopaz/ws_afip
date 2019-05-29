@@ -32,8 +32,8 @@ class Wsfev1
 	
 		$FECAESolicitar = $soapClient->FECAESolicitar($p);
 		
-		file_put_contents($this->config->path . "xml/FECAESolicitar_LastRequest_" . $this->rowEmisor->id_emisor . ".xml", $soapClient->__getLastRequest());
-		file_put_contents($this->config->path . "xml/FECAESolicitar_LastResponse_" . $this->rowEmisor->id_emisor . ".xml", $soapClient->__getLastResponse());
+		file_put_contents($this->config->path . "xml/emisor_" . $this->rowEmisor->id_emisor . "_" . "FECAESolicitar_LastRequest.xml", $soapClient->__getLastRequest());
+		file_put_contents($this->config->path . "xml/emisor_" . $this->rowEmisor->id_emisor . "_" . "FECAESolicitar_LastResponse.xml", $soapClient->__getLastResponse());
 
   		if (is_soap_fault($FECAESolicitar)) {
   			
@@ -83,8 +83,8 @@ class Wsfev1
 	
 		$FECompUltimoAutorizado = $soapClient->FECompUltimoAutorizado($p);
 		
-		file_put_contents($this->config->path . "xml/FECompUltimoAutorizado_LastRequest_" . $this->rowEmisor->id_emisor . ".xml", $soapClient->__getLastRequest());
-		file_put_contents($this->config->path . "xml/FECompUltimoAutorizado_LastResponse_" . $this->rowEmisor->id_emisor . ".xml", $soapClient->__getLastResponse());
+		file_put_contents($this->config->path . "xml/emisor_" . $this->rowEmisor->id_emisor . "_" . "FECompUltimoAutorizado_LastRequest.xml", $soapClient->__getLastRequest());
+		file_put_contents($this->config->path . "xml/emisor_" . $this->rowEmisor->id_emisor . "_" . "FECompUltimoAutorizado_LastResponse.xml", $soapClient->__getLastResponse());
 
   		if (is_soap_fault($FECompUltimoAutorizado)) {
   			
@@ -97,6 +97,54 @@ class Wsfev1
 
   			$resultado->resultado = "A";
   			$resultado->texto_respuesta = $soapClient->__getLastResponse();
+  		}
+  		
+  		return $resultado;
+	}
+	
+	
+	
+	public function FECompConsultar($p) {
+		
+		$resultado = new stdClass;
+		
+    
+		$soapClient = new SoapClient(
+			$this->config->path . "wsdl/wsfev1.wsdl"
+			, array(
+				'soap_version'   => SOAP_1_2
+				, 'location'       => $this->config->wsfev1_url
+				, 'trace'          => 1
+				, 'exceptions'     => 0
+				
+				//, 'proxy_host'     => PROXY_HOST
+				//, 'proxy_port'     => PROXY_PORT
+			)
+		);
+	
+		$FECompConsultar = $soapClient->FECompConsultar($p);
+		
+		file_put_contents($this->config->path . "xml/emisor_" . $this->rowEmisor->id_emisor . "_" . "FECompConsultar_LastRequest.xml", $soapClient->__getLastRequest());
+		file_put_contents($this->config->path . "xml/emisor_" . $this->rowEmisor->id_emisor . "_" . "FECompConsultar_LastResponse.xml", $soapClient->__getLastResponse());
+
+  		if (is_soap_fault($FECompConsultar)) {
+  			
+  			// Error de SOAP
+  			
+			$resultado->resultado = "S";
+			$resultado->texto_respuesta = $soapClient->__getLastResponse();
+
+  		} else {
+  			
+			$xml = new SimpleXMLElement($soapClient->__getLastResponse());
+			$FECompConsultarResult = $xml->children("soap", true)->Body->children()->FECompConsultarResponse->FECompConsultarResult;
+			if (count($FECompConsultarResult->Errors) > 0) {
+				$resultado->resultado = "R";
+			} else {
+				$resultado->resultado = "A";
+			}
+			
+			$resultado->texto_respuesta = $soapClient->__getLastResponse();
   		}
   		
   		return $resultado;
@@ -124,8 +172,8 @@ class Wsfev1
 	
 		$FEDummy = $soapClient->FEDummy();
 		
-		file_put_contents($this->config->path . "xml/FEDummy_LastRequest_" . $this->rowEmisor->id_emisor . ".xml", $soapClient->__getLastRequest());
-		file_put_contents($this->config->path . "xml/FEDummy_LastResponse_" . $this->rowEmisor->id_emisor . ".xml", $soapClient->__getLastResponse());
+		file_put_contents($this->config->path . "xml/emisor_" . $this->rowEmisor->id_emisor . "_" . "FEDummy_LastRequest.xml", $soapClient->__getLastRequest());
+		file_put_contents($this->config->path . "xml/emisor_" . $this->rowEmisor->id_emisor . "_" . "FEDummy_LastResponse.xml", $soapClient->__getLastResponse());
 
   		if (is_soap_fault($FEDummy)) {
   			

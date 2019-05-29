@@ -5,9 +5,9 @@ require_once("class/comp/Ws_afip.class.php");
 
 
 
-$modo = "H";
+$modo = "homologacion";
 
-$Ws_afip = new Ws_afip(1, $modo);
+$Ws_afip = new Ws_afip(2, $modo);
 
 
 
@@ -27,11 +27,11 @@ if ($FEDummy->resultado == "A") {
 	$FEDummyResult = $xml->children("soap", true)->Body->children()->FEDummyResponse->FEDummyResult;
 	
 	echo "<br><br>";
-	echo "AppServer: " . $FEDummyResult->AppServer;
-	echo "<br>";
-	echo "DbServer: " . $FEDummyResult->DbServer;
-	echo "<br>";
-	echo "AuthServer: " . $FEDummyResult->AuthServer;
+	
+	echo "AppServer: " .	$FEDummyResult->AppServer		. "<br>";
+	echo "DbServer: " .		$FEDummyResult->DbServer		. "<br>";
+	echo "AuthServer: " .	$FEDummyResult->AuthServer		. "<br>";
+	
 	echo "<br><br>";
 
 }
@@ -61,11 +61,11 @@ if ($FECompUltimoAutorizado->resultado == "A") {
 	$FECompUltimoAutorizadoResult = $xml->children("soap", true)->Body->children()->FECompUltimoAutorizadoResponse->FECompUltimoAutorizadoResult;
 	
 	echo "<br><br>";
-	echo "PtoVta: " . $FECompUltimoAutorizadoResult->PtoVta;
-	echo "<br>";
-	echo "CbteTipo: " . $FECompUltimoAutorizadoResult->CbteTipo;
-	echo "<br>";
-	echo "CbteNro: " . $FECompUltimoAutorizadoResult->CbteNro;
+	
+	echo "PtoVta: " .		$FECompUltimoAutorizadoResult->PtoVta		. "<br>";
+	echo "CbteTipo: " .		$FECompUltimoAutorizadoResult->CbteTipo		. "<br>";
+	echo "CbteNro: " .		$FECompUltimoAutorizadoResult->CbteNro		. "<br>";
+	
 	echo "<br><br>";
 
 }
@@ -91,7 +91,6 @@ echo json_encode($FECompUltimoAutorizado);
 echo "<br><br>";
 echo "<br><br>";
 echo "FECAESolicitar =============================================";
-echo "<br><br>";
 
 
 		
@@ -210,10 +209,10 @@ $p = array(
 		"FeDetReq" => array(
 			"FECAEDetRequest" => array(
 				"Concepto"		=> 1,				// 1=Productos, 2=Servicios, 3=Productos y Servicios
-				"DocTipo"		=> 80,				// 80=CUIL
+				"DocTipo"		=> 80,				// 80=CUIT
 				"DocNro"		=> 20219021810,
-				"CbteDesde"		=> 1366,			// rango 1-99999999
-				"CbteHasta"		=> 1366,			// rango 1-99999999
+				"CbteDesde"		=> 7,			// rango 1-99999999
+				"CbteHasta"		=> 7,			// rango 1-99999999
 				"CbteFch"		=> date('Ymd'),		// fecha emision de factura
 				"ImpNeto"		=> 100,				// neto gravado
 				"ImpTotConc"	=> 0,				// no gravado
@@ -226,17 +225,54 @@ $p = array(
 				"FchVtoPago"	=> null,			// solo Concepto = 2 o 3
 				"MonId"			=> "PES",			// Id de moneda "PES"
 				"MonCotiz"		=> 1,				// Cotizacion moneda. Solo exportacion
+				
+				/*
+				"CbtesAsoc" => array(
+					"CbteAsoc" => array(
+						array(
+							"Tipo"		=> 1,
+							"PtoVta"	=> 4000,
+							"Nro"		=> 1
+						)
+					),
+
+					"CbteAsoc" => array(
+						array(
+							"Tipo"		=> 1,
+							"PtoVta"	=> 4000,
+							"Nro"		=> 2
+						)
+					),
+
+				),
+				*/
+				
+				
 				"Tributos" => array(
 					"Tributo" => array(
 						array(
-							"Id"		=>  1,
+							"Id"		=> 1,
 							"Desc"		=> "impuesto",
 							"BaseImp"	=> 0,
 							"Alic"		=> 0,
 							"Importe"	=> 0
 						)
 					),
+					/*
+					"Tributo" => array(
+						array(
+							"Id"		=> 1,
+							"Desc"		=> "impuesto",
+							"BaseImp"	=> 0,
+							"Alic"		=> 0,
+							"Importe"	=> 0
+						)
+					),
+					*/
 				),
+				
+				
+				
 				"Iva" => array(
 					"AlicIva" => array(
 						array(
@@ -253,6 +289,8 @@ $p = array(
 						*/
 					),
 				),
+				
+				
 			), 
 		), 
 	), 
@@ -271,10 +309,7 @@ $p = array(
 
 
 
-if ($modo == "H") $ws_afip_modo = "homologacion"; else if ($modo == "P") $ws_afip_modo = "produccion";
-
-
-$mysqli = new mysqli("$ws_afip_servidor", "$ws_afip_usuario", "$ws_afip_password", "ws_afip_" . $ws_afip_modo);
+$mysqli = new mysqli("$ws_afip_servidor", "$ws_afip_usuario", "$ws_afip_password", "ws_afip_" . $modo);
 $mysqli->query("SET NAMES 'utf8'");
 
 
@@ -297,9 +332,10 @@ if (isset($FECAESolicitar->id_documento)) {
 	$rowDocumento = $rsDocumento->fetch_object();
 	
 	echo "<br><br>";
-	echo "CAE: " . $rowDocumento->CAE;
-	echo "<br>";
-	echo "CAEFchVto: " . $rowDocumento->CAEFchVto;
+	
+	echo "CAE: " .			$rowDocumento->CAE			. "<br>";
+	echo "CAEFchVto: " .	$rowDocumento->CAEFchVto	. "<br>";
+	
 	echo "<br><br>";
 	
 	
@@ -324,9 +360,10 @@ if (isset($FECAESolicitar->id_documento)) {
 		
 		foreach ($Errors->Err as $item) {
 			echo "<br><br>";
-			echo "Err Code: " . $item->Code;
-			echo "<br>";
-			echo "Err Msg: " . $item->Msg;
+			
+			echo "Err Code: " .		$item->Code		. "<br>";
+			echo "Err Msg: " .		$item->Msg		. "<br>";
+			
 			echo "<br><br>";
 		}
 	}
@@ -342,9 +379,10 @@ if (isset($FECAESolicitar->id_documento)) {
 				
 				foreach ($Observaciones->Obs as $item) {
 					echo "<br><br>";
-					echo "Obs Code: " . $item->Code;
-					echo "<br>";
-					echo "Obs Msg: " . $item->Msg;
+					
+					echo "Obs Code: " .		$item->Code		. "<br>";
+					echo "Obs Msg: " .		$item->Msg		. "<br>";
+					
 					echo "<br><br>";
 				}
 			}
@@ -388,9 +426,10 @@ if (isset($FECAESolicitar->id_documento)) {
 			
 			foreach ($Errors->Err as $item) {
 				echo "<br><br>";
-				echo "Err Code: " . $item->Code;
-				echo "<br>";
-				echo "Err Msg: " . $item->Msg;
+				
+				echo "Err Code: " .		$item->Code		. "<br>";
+				echo "Err Msg: " .		$item->Msg		. "<br>";
+				
 				echo "<br><br>";
 			}
 		}
@@ -406,9 +445,10 @@ if (isset($FECAESolicitar->id_documento)) {
 					
 					foreach ($Observaciones->Obs as $item) {
 						echo "<br><br>";
-						echo "Obs Code: " . $item->Code;
-						echo "<br>";
-						echo "Obs Msg: " . $item->Msg;
+						
+						echo "Obs Code: " .		$item->Code		. "<br>";
+						echo "Obs Msg: " .		$item->Msg		. "<br>";
+						
 						echo "<br><br>";
 					}
 				}
@@ -436,17 +476,161 @@ if (isset($FECAESolicitar->id_documento)) {
 		echo "<br><br>";
 		echo "Error de SOAP wsaa";
 		echo "<br><br>";
-		echo "Fault Code Value: " . $Value;
-		echo "<br>";
-		echo "Fault Reason Text: " . $Text;
+		
+		echo "Fault Code Value: " .		$Value		. "<br>";
+		echo "Fault Reason Text: " .	$Text		. "<br>";
+		
 		echo "<br>";
 		
 	}
 }
 
 echo "<br><br>";
-echo "<br><br>";
 echo json_encode($FECAESolicitar);
 	
+
+
+
+
+
+
+
+
+
+//FECompConsultar =============================================
+echo "<br><br>";
+echo "<br><br>";
+echo "FECompConsultar =============================================";
+
+$p = array(
+	"FeCompConsReq" => array(
+		"PtoVta"	=> 4000,
+		"CbteTipo"	=> 1,
+		"CbteNro"	=> 5
+	)
+);
+
+$FECompConsultar = $Ws_afip->FECompConsultar($p);
+if ($FECompConsultar->resultado == "A") {
+	$xml = new SimpleXMLElement($FECompConsultar->texto_respuesta);
+	$FECompConsultarResult = $xml->children("soap", true)->Body->children()->FECompConsultarResponse->FECompConsultarResult;
+	
+	echo "<br><br>";
+	
+	echo "Concepto: " .		$FECompConsultarResult->ResultGet->Concepto			. "<br>";
+	echo "DocTipo: " .		$FECompConsultarResult->ResultGet->DocTipo			. "<br>";
+	echo "DocNro: " .		$FECompConsultarResult->ResultGet->DocNro			. "<br>";
+	echo "CbteDesde: " .	$FECompConsultarResult->ResultGet->CbteDesde		. "<br>";
+	echo "CbteHasta: " .	$FECompConsultarResult->ResultGet->CbteHasta		. "<br>";
+	echo "CbteFch: " .		$FECompConsultarResult->ResultGet->CbteFch			. "<br>";
+	echo "ImpTotal: " .		$FECompConsultarResult->ResultGet->ImpTotal			. "<br>";
+	echo "ImpTotConc: " .	$FECompConsultarResult->ResultGet->ImpTotConc		. "<br>";
+	echo "ImpNeto: " .		$FECompConsultarResult->ResultGet->ImpNeto			. "<br>";
+	echo "ImpOpEx: " .		$FECompConsultarResult->ResultGet->ImpOpEx			. "<br>";
+	echo "ImpTrib: " .		$FECompConsultarResult->ResultGet->ImpTrib			. "<br>";
+	echo "ImpIVA: " .		$FECompConsultarResult->ResultGet->ImpIVA			. "<br>";
+	echo "FchServDesde: " .	$FECompConsultarResult->ResultGet->FchServDesde		. "<br>";
+	echo "FchServHasta: " .	$FECompConsultarResult->ResultGet->FchServHasta		. "<br>";
+	echo "FchVtoPago: " .	$FECompConsultarResult->ResultGet->FchVtoPago		. "<br>";
+	echo "MonId: " .		$FECompConsultarResult->ResultGet->MonId			. "<br>";
+	echo "MonCotiz: " .		$FECompConsultarResult->ResultGet->MonCotiz			. "<br>";
+	
+	if (count($FECompConsultarResult->ResultGet->CbtesAsoc) > 0) {
+		echo "<br>";
+		echo "CbtesAsoc" . "<br>";
+		foreach ($FECompConsultarResult->ResultGet->CbtesAsoc->CbteAsoc as $item) {
+			echo "Tipo: " .		$item->Tipo		. "<br>";
+			echo "PtoVta: " .	$item->PtoVta	. "<br>";
+			echo "Nro: " .		$item->Nro		. "<br>";
+			echo "<br>";
+		}
+	}
+	
+	if (count($FECompConsultarResult->ResultGet->Tributos) > 0) {
+		echo "<br>";
+		echo "Tributos" . "<br>";
+		foreach ($FECompConsultarResult->ResultGet->Tributos->Tributo as $item) {
+			echo "Id: " .		$item->Id			. "<br>";
+			echo "Desc: " .		$item->Desc			. "<br>";
+			echo "BaseImp: " .	$item->BaseImp		. "<br>";
+			echo "Alic: " .		$item->Alic			. "<br>";
+			echo "Importe: " .	$item->Importe		. "<br>";
+			echo "<br>";
+		}
+	}
+	
+	if (count($FECompConsultarResult->ResultGet->Iva) > 0) {
+		echo "<br>";
+		echo "Iva" . "<br>";
+		foreach ($FECompConsultarResult->ResultGet->Iva->AlicIva as $item) {
+			echo "Id: " .		$item->Id		. "<br>";
+			echo "BaseImp: " .	$item->BaseImp	. "<br>";
+			echo "Importe: " .	$item->Importe	. "<br>";
+			echo "<br>";
+		}
+	}
+	
+	if (count($FECompConsultarResult->ResultGet->Opcionales) > 0) {
+		echo "<br>";
+		echo "Opcionales" . "<br>";
+		foreach ($FECompConsultarResult->ResultGet->Opcionales->Opcional as $item) {
+			echo "Id: " .		$item->Id		. "<br>";
+			echo "Valor: " .	$item->Valor	. "<br>";
+			echo "<br>";
+		}
+	}
+	
+	if (count($FECompConsultarResult->ResultGet->Compradores) > 0) {
+		echo "<br>";
+		echo "Compradores" . "<br>";
+		foreach ($FECompConsultarResult->ResultGet->Compradores->Comprador as $item) {
+			echo "DocTipo: " .		$item->DocTipo		. "<br>";
+			echo "DocNro: " .		$item->DocNro		. "<br>";
+			echo "Porcentaje: " .	$item->Porcentaje	. "<br>";
+			echo "<br>";
+		}
+	}
+	
+	echo "Resultado: " .		$FECompConsultarResult->ResultGet->Resultado			. "<br>";
+	echo "CodAutorizacion: " .	$FECompConsultarResult->ResultGet->CodAutorizacion		. "<br>";
+	echo "EmisionTipo: " .		$FECompConsultarResult->ResultGet->EmisionTipo			. "<br>";
+	echo "FchVto: " .			$FECompConsultarResult->ResultGet->FchVto				. "<br>";
+	echo "FchProceso: " .		$FECompConsultarResult->ResultGet->FchProceso			. "<br>";
+	
+	if (count($FECompConsultarResult->ResultGet->Observaciones) > 0) {
+		echo "<br>";
+		echo "Observaciones" . "<br>";
+		foreach ($FECompConsultarResult->ResultGet->Observaciones->Obs as $item) {
+			echo "Code: " .		$item->Code		. "<br>";
+			echo "Msg: " .		$item->Msg		. "<br>";
+			echo "<br>";
+		}
+	}
+	
+	echo "PtoVta: " .		$FECompConsultarResult->ResultGet->PtoVta		. "<br>";
+	echo "CbteTipo: " .		$FECompConsultarResult->ResultGet->CbteTipo		. "<br>";
+	
+	echo "<br><br>";
+
+} else if ($FECompConsultar->resultado == "R") {
+	$xml = new SimpleXMLElement($FECompConsultar->texto_respuesta);
+	$FECompConsultarResult = $xml->children("soap", true)->Body->children()->FECompConsultarResponse->FECompConsultarResult;
+	
+	echo "<br><br>";
+	
+	if (count($FECompConsultarResult->Errors) > 0) {
+		echo "<br>";
+		echo "Errores" . "<br>";
+		foreach ($FECompConsultarResult->Errors->Err as $item) {
+			echo "Code: " .		$item->Code		. "<br>";
+			echo "Msg: " .		$item->Msg		. "<br>";
+			echo "<br>";
+		}
+	}
+}
+
+echo json_encode($FECompConsultar);
+
+
 
 ?>

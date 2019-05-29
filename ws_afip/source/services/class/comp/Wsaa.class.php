@@ -26,18 +26,18 @@ class Wsaa
 		$TRA->header->addChild('generationTime', date('c', date('U') - 60));
 		$TRA->header->addChild('expirationTime', date('c', date('U') + 60));
 		$TRA->addChild('service', $this->service);
-		$TRA->asXML($this->config->path . "xml/TRA" . $this->cadena . ".xml");
+		$TRA->asXML($this->config->path . "xml/" . $this->cadena . "TRA.xml");
 	}
 	
 	
 	function SignTRA() {
 		
-		$fp = fopen($this->config->path . "xml/TRA" . $this->cadena . ".tmp", "w");
+		$fp = fopen($this->config->path . "xml/" . $this->cadena . "TRA.tmp", "w");
 		fclose($fp);
 		
 		$STATUS = openssl_pkcs7_sign(
-			realpath($this->config->path . "xml/TRA" . $this->cadena . ".xml")
-			, realpath($this->config->path . "xml/TRA" . $this->cadena . ".tmp")
+			realpath($this->config->path . "xml/" . $this->cadena . "TRA.xml")
+			, realpath($this->config->path . "xml/" . $this->cadena . "TRA.tmp")
 			, "file://" . realpath($this->config->path . "key/" . $this->config->crt)
 			, array("file://" . realpath($this->config->path . "key/" . $this->config->key), $this->config->passphrase)
 			, array()
@@ -49,7 +49,7 @@ class Wsaa
   			throw new Exception("ERROR generating PKCS#7 signature\n");
   		}
   		
-		$inf = fopen($this->config->path . "xml/TRA" . $this->cadena . ".tmp", "r");
+		$inf = fopen($this->config->path . "xml/" . $this->cadena . "TRA.tmp", "r");
 		$i = 0;
 		$CMS = "";
 		while (! feof($inf)) { 
@@ -62,7 +62,7 @@ class Wsaa
 		fclose($inf);
 		
 		#  unlink("TRA.xml");
-		unlink($this->config->path . "xml/TRA" . $this->cadena . ".tmp");
+		unlink($this->config->path . "xml/" . $this->cadena . "TRA.tmp");
 		
 		return $CMS;
 	}
@@ -86,8 +86,8 @@ class Wsaa
 		);
            
 		$loginCms = $soapClient->loginCms(array('in0' => $CMS));
-		file_put_contents($this->config->path . "xml/loginCms_LastRequest" . $this->cadena . ".xml", $soapClient->__getLastRequest());
-		file_put_contents($this->config->path . "xml/loginCms_LastResponse" . $this->cadena . ".xml", $soapClient->__getLastResponse());
+		file_put_contents($this->config->path . "xml/" . $this->cadena . "loginCms_LastRequest.xml", $soapClient->__getLastRequest());
+		file_put_contents($this->config->path . "xml/" . $this->cadena . "loginCms_LastResponse.xml", $soapClient->__getLastResponse());
 		
   		if (is_soap_fault($loginCms)) {
   			
@@ -99,7 +99,7 @@ class Wsaa
   		} else {
   			$loginCmsReturn = $loginCms->loginCmsReturn;
   			
-  			file_put_contents($this->config->path . "xml/TA" . $this->cadena . ".xml", $loginCmsReturn);
+  			file_put_contents($this->config->path . "xml/" . $this->cadena . "TA.xml", $loginCmsReturn);
   			
   			$resultado->resultado = "A";
   			$resultado->texto_respuesta = $loginCmsReturn;
@@ -118,14 +118,15 @@ class Wsaa
 	public function GetTA($service = "wsfe") {
 		
 		$this->service = $service;
-		$this->cadena = "_" . $service . "_" . $this->rowEmisor->id_emisor;
+		//$this->cadena = "_" . $service . "_" . $this->rowEmisor->id_emisor;
+		$this->cadena = "emisor_" . $this->rowEmisor->id_emisor . "_" . $service . "_";
 		
 		
 		$resultado = new stdClass;
 		$resultado->TA = false;
 		
-		if (is_file($this->config->path . "xml/TA" . $this->cadena . ".xml")) {
-			$resultado->TA = simplexml_load_file($this->config->path . "xml/TA" . $this->cadena . ".xml");
+		if (is_file($this->config->path . "xml/" . $this->cadena . "TA.xml")) {
+			$resultado->TA = simplexml_load_file($this->config->path . "xml/" . $this->cadena . "TA.xml");
 		
 			if ($resultado->TA) {
 				$expirationTime = $resultado->TA->header->expirationTime;
