@@ -7,7 +7,7 @@ require_once("class/comp/Ws_afip.class.php");
 
 $modo = "homologacion";
 
-$Ws_afip = new Ws_afip(2, $modo);
+$Ws_afip = new Ws_afip(1, $modo);
 
 
 

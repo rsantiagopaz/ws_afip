@@ -1,0 +1,6 @@
+* habilitar en php.ini extensiones php_soap y php_openssl
+
+* instalar las bases ws_afip.sql.gz, ws_afip_homologacion.sql.gz, ws_afip_produccion.sql.gz
+* configurar parametros de conexion en Conexion.php
+
+* generar certificados 'wsass - certificados homologacion' y autorizacion a servicio wsfe (web service factura electronica) en Afip
